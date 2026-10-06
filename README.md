@@ -106,7 +106,7 @@ password: <supplied by TerraPay>
 > Perform this call from **your backend** and have the app fetch the token pair
 > from your own API. Credentials compiled into an app can be extracted.
 
-`example/src/tokenService.ts` has a reference implementation.
+The PayByWallet sample app (`src/tokenService.ts`) has a reference implementation.
 
 ## 🌍 Environments
 
@@ -240,16 +240,10 @@ event instead — handle both.
 | `Manifest merger failed : uses-sdk:minSdkVersion 24` | Set `minSdkVersion = 28` in `android/build.gradle` |
 | Gradle fails with a bare version number | Wrong JDK; build with JDK 17 |
 
-## 🧪 Example app
+## 🧪 Sample app
 
-```sh
-yarn
-cp example/src/credentials.example.ts example/src/credentials.ts   # add UAT pair
-yarn example android
-cd example/ios && pod install && cd ../.. && yarn example ios
-```
-
-Demo PIN is `1234`.
+A runnable sample app that consumes this package is maintained separately as
+`paybywallet_sample`. Demo PIN is `1234`.
 
 ## 🔄 Updating the native SDKs
 
