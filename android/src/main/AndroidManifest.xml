@@ -1,0 +1,26 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <!-- INTERNET / CAMERA / NFC come from the PayByWallet .aar manifest.
+         The SDK declares NFC host-card-emulation as *required*, which would keep
+         every embedding app off emulators and non-NFC handsets, so it is relaxed
+         here. Apps that genuinely require HCE can override it back. -->
+    <uses-feature
+        android:name="android.hardware.nfc.hce"
+        android:required="false"
+        tools:replace="android:required" />
+
+    <application>
+        <!-- The SDK declares PaymentsHomeActivity with an android:label but no
+             android:theme, so it falls back to the platform default, which has an
+             ActionBar. That renders a stray bar showing the SDK's internal
+             "PaymentsHome" label above the SDK's own green header. Merging a
+             NoActionBar theme onto the existing declaration removes the bar and
+             changes nothing else: DeviceDefault is the theme it already resolves
+             to. -->
+        <activity
+            android:name="com.terrapay.payByWallet.PaymentsHomeActivity"
+            android:theme="@android:style/Theme.DeviceDefault.NoActionBar"
+            tools:node="merge" />
+    </application>
+</manifest>

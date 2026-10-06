@@ -1,0 +1,134 @@
+buildscript {
+  ext.PayByWallet = [
+    kotlinVersion: "2.2.21",
+    // The PayByWallet SDK requires API 28+ and targets compileSdk 36.
+    minSdkVersion: 28,
+    compileSdkVersion: 36
+  ]
+
+  ext.getExtOrDefault = { prop ->
+    if (rootProject.ext.has(prop)) {
+      return rootProject.ext.get(prop)
+    }
+
+    return PayByWallet[prop]
+  }
+
+  repositories {
+    google()
+    mavenCentral()
+  }
+
+  dependencies {
+    classpath "com.android.tools.build:gradle:8.13.0"
+    // noinspection DifferentKotlinGradleVersion
+    classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:${getExtOrDefault('kotlinVersion')}"
+  }
+}
+
+// AGP rejects `implementation files("...aar")` inside a library module
+// ("Direct local .aar file dependencies are not supported when building an
+// AAR"). Exposing libs/ as a flatDir repository makes the SDK resolve as a
+// normal module dependency instead, which does get packaged into the app.
+def payByWalletLibs = "$projectDir/libs"
+
+rootProject.allprojects {
+  repositories {
+    google()
+    mavenCentral()
+    // sdp-compose, a transitive dependency of the PayByWallet .aar.
+    maven { url = uri("https://jitpack.io") }
+    flatDir { dirs payByWalletLibs }
+  }
+}
+
+apply plugin: "com.android.library"
+
+if (project.extensions.findByName("kotlin") == null) {
+  apply plugin: "kotlin-android"
+}
+
+apply plugin: "com.facebook.react"
+
+android {
+  namespace "com.terrapay.paybywallet.reactnative"
+
+  compileSdkVersion getExtOrDefault("compileSdkVersion")
+
+  defaultConfig {
+    minSdkVersion Math.max(28, getExtOrDefault("minSdkVersion") as int)
+    // Applied to the consuming app's R8 pass. The shipped .aar carries no
+    // proguard.txt of its own, so without this every app embedding it would
+    // have to copy the SDK's keep rules by hand -- and getting them wrong
+    // silently breaks Gson in release builds only.
+    consumerProguardFiles "consumer-rules.pro"
+  }
+
+  compileOptions {
+    sourceCompatibility JavaVersion.VERSION_17
+    targetCompatibility JavaVersion.VERSION_17
+  }
+
+  packaging {
+    resources {
+      excludes += "/META-INF/{AL2.0,LGPL2.1}"
+    }
+  }
+}
+
+dependencies {
+  implementation "com.facebook.react:react-android"
+
+  // The PayByWallet SDK, vendored as a local .aar (via the flatDir repo above).
+  implementation name: "payByWallet-release", ext: "aar"
+
+  // A local .aar carries no POM, so the SDK's transitive dependencies are
+  // declared here by hand. Kept identical to the Flutter plugin's list, which
+  // was derived with `jdeps -verbose:package` over the .aar's classes.jar.
+  // Re-verify whenever the .aar is refreshed.
+  implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.9.0"
+  implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3"
+  implementation "com.github.Kaaveh:sdp-compose:1.1.0"
+
+  implementation "androidx.core:core-ktx:1.15.0"
+  implementation "androidx.appcompat:appcompat:1.7.1"
+  implementation "androidx.activity:activity-ktx:1.12.0"
+  implementation "androidx.activity:activity-compose:1.12.0"
+  implementation "androidx.lifecycle:lifecycle-runtime-ktx:2.10.0"
+  implementation "androidx.lifecycle:lifecycle-runtime-compose:2.10.0"
+  implementation "androidx.lifecycle:lifecycle-viewmodel-compose:2.10.0"
+
+  implementation platform("androidx.compose:compose-bom:2025.11.01")
+  implementation "androidx.compose.ui:ui"
+  implementation "androidx.compose.ui:ui-graphics"
+  implementation "androidx.compose.foundation:foundation"
+  implementation "androidx.compose.runtime:runtime"
+  implementation "androidx.compose.material3:material3:1.4.0"
+  implementation "androidx.compose.material:material-icons-extended:1.7.8"
+  implementation "androidx.navigation:navigation-compose:2.8.9"
+  implementation "com.google.accompanist:accompanist-systemuicontroller:0.36.0"
+  implementation "com.airbnb.android:lottie-compose:6.4.1"
+
+  implementation "io.github.raamcosta.compose-destinations:core:1.9.62"
+  implementation "io.github.raamcosta.compose-destinations:animations-core:1.9.62"
+
+  implementation "com.squareup.retrofit2:retrofit:2.9.0"
+  implementation "com.squareup.retrofit2:converter-gson:2.9.0"
+  implementation "com.google.code.gson:gson:2.10.1"
+  implementation "com.squareup.okhttp3:okhttp:5.0.0-alpha.12"
+  implementation "com.squareup.okhttp3:okhttp-sse:5.0.0-alpha.12"
+  implementation "com.squareup.okhttp3:logging-interceptor:5.0.0-alpha.12"
+
+  implementation "androidx.camera:camera-camera2:1.5.1"
+  implementation "androidx.camera:camera-lifecycle:1.5.1"
+  implementation "androidx.camera:camera-view:1.5.1"
+  // Bundled barcode scanning: ships the ~4.7 MB detection model inside the
+  // APK. Do NOT swap this for
+  // "com.google.android.gms:play-services-mlkit-barcode-scanning" to save the
+  // space -- that variant loads the detector from Play Services, and on
+  // devices without it (Huawei and other non-GMS handsets, core devices for
+  // this SDK) scanning silently never detects a QR.
+  implementation "com.google.mlkit:barcode-scanning:17.3.0"
+  implementation "com.google.android.gms:play-services-code-scanner:16.1.0"
+  implementation "com.google.zxing:core:3.5.4"
+}
