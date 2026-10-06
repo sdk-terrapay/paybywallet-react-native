@@ -252,6 +252,10 @@ A runnable sample app that consumes this package is maintained separately as
 | iOS | `ios/Frameworks/TerraPayWalletSDK.xcframework` | `rm -rf ios/Frameworks/TerraPayWalletSDK.xcframework/*/dSYMs` |
 | Android | `android/libs/payByWallet-release.aar` | Re-check transitive deps in `android/build.gradle` and keep-rules in `android/consumer-rules.pro` |
 
+After changing anything in `src/`, run `yarn build` and commit the regenerated
+`lib/` folder. It is checked in so partners can install from GitHub with any
+package manager without a build step.
+
 ## 🔐 License
 
 Released under the MIT License. See [LICENSE](LICENSE).
