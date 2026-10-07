@@ -131,7 +131,6 @@ class PayByWalletModule(reactContext: ReactApplicationContext) :
     TerraPayClient.init(
       context = activity,
       config = sdkConfig,
-      referenceNumber = config.string("referenceNumber"),
       terraPayResult = callbacks,
     )
     awaitingResult = true

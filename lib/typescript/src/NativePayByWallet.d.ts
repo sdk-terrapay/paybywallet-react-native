@@ -18,8 +18,6 @@ export type NativeConfig = {
     secondaryColor: string;
     /** `sandbox` | `production` */
     environment: string;
-    /** Android only; ignored on iOS. */
-    referenceNumber?: string;
 };
 /**
  * Flat payload for every SDK callback. `type` says which fields are set:

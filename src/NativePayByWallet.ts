@@ -24,8 +24,6 @@ export type NativeConfig = {
   secondaryColor: string;
   /** `sandbox` | `production` */
   environment: string;
-  /** Android only; ignored on iOS. */
-  referenceNumber?: string;
 };
 
 /**

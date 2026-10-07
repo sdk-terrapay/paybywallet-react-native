@@ -21,8 +21,6 @@ export type PayByWalletConfig = {
     secondaryColor: string;
     /** Defaults to `sandbox`. */
     environment?: PayByWalletEnvironment;
-    /** Android only: optional reference passed through to `TerraPayClient.init`. */
-    referenceNumber?: string;
 };
 /** Merchant the user is about to pay, delivered with `pinAuthenticate`. */
 export type MerchantDetails = {

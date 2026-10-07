@@ -28,7 +28,6 @@ export const PayByWallet = {
       primaryColor: config.primaryColor,
       secondaryColor: config.secondaryColor,
       environment: config.environment ?? 'sandbox',
-      referenceNumber: config.referenceNumber,
     });
   },
 
